@@ -1,0 +1,73 @@
+
+-Goal-
+Given an aviation accident report or related text, identify all entities relevant to the "Human-Machine-Environment-Management" (人-机-环-管) framework and all causal/descriptive relationships among them. The goal is to construct a knowledge graph that enables root-cause analysis.
+
+-Entity Types-
+- person (人): Pilots, crew members, air traffic controllers, maintenance personnel, etc.
+- equipment (机/设备): Aircraft, engines, avionics, ground equipment, tools, etc.
+- environment (环/环境): Weather conditions, airport conditions, terrain, lighting, etc.
+- organization (管/组织/管理): Airlines, regulatory bodies, maintenance organizations, management policies, etc.
+- procedure (程序): Standard Operating Procedures (SOPs), manuals, checklists, etc.
+- event (事件): Specific occurrences during the accident sequence (e.g., engine flameout, hard landing).
+- weather (天气): Specific meteorological factors.
+- violation (违规操作): Non-compliance with regulations or procedures.
+
+-Relationship Types-
+- leads to / causes (导致): One event or factor directly or indirectly resulting in another.
+- limited by (受限于): An entity's performance or state is constrained by another factor.
+- violates (违反): A person or action not following a procedure or regulation.
+- not executed (未执行): A required procedure or action that was omitted.
+- belongs to (属于): An entity is part of an organization or category.
+
+-Steps-
+1. Identify all entities. For each identified entity, extract the following information:
+- entity_name: Name of the entity, capitalized
+- entity_type: One of the types listed above: [{entity_types}]
+- entity_description: Detailed description of the entity's role, state, or attributes in the context of the accident.
+Format each entity as ("entity"<|><entity_name><|><entity_type><|><entity_description>)
+ 
+2. Identify all pairs of (source_entity, target_entity) that have a clear causal, constraint, or structural relationship.
+For each pair of related entities, extract:
+- source_entity: name of the source entity
+- target_entity: name of the target entity
+- relationship_description: explanation of the relationship (e.g., "The pilot failed to monitor the altitude, leading to the crash")
+- relationship_strength: a numeric score (1-10) indicating the significance of this link in the accident chain.
+ Format each relationship as ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
+ 
+3. Return output in English (or the language of the source text if preferred, but usually English for consistency in KG) as a single list. Use **##** as the list delimiter.
+ 
+4. When finished, output <|COMPLETE|>
+ 
+######################
+-Examples-
+######################
+Example 1:
+Entity_types: PERSON, EQUIPMENT, EVENT, VIOLATION
+Text:
+The captain of flight AA123 failed to cross-check the altimeter settings before descent. As a result, the aircraft descended below the minimum safe altitude and struck a ridge. The post-crash investigation revealed that the captain violated the company's landing checklist procedures.
+######################
+Output:
+("entity"<|>CAPTAIN OF FLIGHT AA123<|>PERSON<|>The pilot in command who failed to verify flight instruments)
+##
+("entity"<|>ALTIMETER<|>EQUIPMENT<|>Flight instrument used to measure altitude)
+##
+("entity"<|>ALTITUDE DEVIATION<|>EVENT<|>The aircraft flying below the prescribed safe level)
+##
+("entity"<|>STRUCK A RIDGE<|>EVENT<|>The final impact of the aircraft with terrain)
+##
+("entity"<|>CHECKLIST VIOLATION<|>VIOLATION<|>Non-compliance with the company's mandatory landing procedures)
+##
+("relationship"<|>CAPTAIN OF FLIGHT AA123<|>ALTITUDE DEVIATION<|>The captain's failure to check instruments led to the altitude deviation<|>9)
+##
+("relationship"<|>ALTITUDE DEVIATION<|>STRUCK A RIDGE<|>The uncontrolled descent resulted in the collision with the ridge<|>10)
+##
+("relationship"<|>CAPTAIN OF FLIGHT AA123<|>CHECKLIST VIOLATION<|>The captain failed to follow the required checklist<|>8)
+<|COMPLETE|>
+
+######################
+-Real Data-
+######################
+Entity_types: {entity_types}
+Text: {input_text}
+######################
+Output:
