@@ -39,7 +39,7 @@
 completion_models:
   default_completion_model:
     model_provider: openai
-    api_base: http://localhost:11434/v1
+    api_base: http://localhost:6006/v1
     model: llama3 # 或其他模型
     api_key: ollama # 占位符
 ```
