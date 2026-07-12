@@ -1,67 +1,71 @@
 
 -Goal-
-Given an aviation accident report or related text, identify all entities relevant to the "Human-Machine-Environment-Management" (人-机-环-管) framework and all causal/descriptive relationships among them. The goal is to construct a knowledge graph that enables root-cause analysis.
+Given an aviation accident report, project proposal, or evaluation plan, identify the most significant entities and causal/structural relationships. Use the "Human-Machine-Environment-Management" (人-机-环-管) framework. Focus on factors that are critical to understanding the document's main purpose or the accident's root causes.
 
 -Entity Types-
-- person (人): Pilots, crew members, air traffic controllers, maintenance personnel, etc.
-- equipment (机/设备): Aircraft, engines, avionics, ground equipment, tools, etc.
-- environment (环/环境): Weather conditions, airport conditions, terrain, lighting, etc.
-- organization (管/组织/管理): Airlines, regulatory bodies, maintenance organizations, management policies, etc.
-- procedure (程序): Standard Operating Procedures (SOPs), manuals, checklists, etc.
-- event (事件): Specific occurrences during the accident sequence (e.g., engine flameout, hard landing).
+- person (人): Pilots, crew members, air traffic controllers, maintenance personnel, engineers, authors, etc.
+- equipment (机/设备): Aircraft, engines, avionics, software systems, tools, etc.
+- environment (环/环境): Weather conditions, airport conditions, terrain, project constraints, etc.
+- organization (组织): Airlines, regulatory bodies, laboratories, companies, departments, etc.
+- procedure (程序): Standard Operating Procedures (SOPs), manuals, checklists, project plans, etc.
+- event (事件): Specific occurrences (e.g., engine flameout, project kickoff, system deployment).
 - weather (天气): Specific meteorological factors.
-- violation (违规操作): Non-compliance with regulations or procedures.
+- violation (违规): Non-compliance with regulations, procedures, or requirements.
 
 -Relationship Types-
-- leads to / causes (导致): One event or factor directly or indirectly resulting in another.
+- leads to / causes (导致): One event or factor resulting in another.
 - limited by (受限于): An entity's performance or state is constrained by another factor.
 - violates (违反): A person or action not following a procedure or regulation.
 - not executed (未执行): A required procedure or action that was omitted.
 - belongs to (属于): An entity is part of an organization or category.
+- manages / authors (管理/编写): An organization or person responsible for a document or system.
 
 -Steps-
-1. Identify all entities. For each identified entity, extract the following information:
-- entity_name: Name of the entity, capitalized
-- entity_type: One of the types listed above: [{entity_types}]
-- entity_description: Detailed description of the entity's role, state, or attributes in the context of the accident.
-Format each entity as ("entity"<|><entity_name><|><entity_type><|><entity_description>)
+1. Identify **core** entities. Do not extract every minor detail; focus on what is central to the text.
+- Strictly use the types: person, equipment, environment, organization, procedure, event, weather, violation.
+- entity_name: **Use the EXACT name as it appears in the source text (do not translate, do not normalize).** Capitalize if the original is in English.
+- entity_description: Detailed description in the same language as the source text.
+Format: ("entity"<|><entity_name><|><entity_type><|><entity_description>)
  
-2. Identify all pairs of (source_entity, target_entity) that have a clear causal, constraint, or structural relationship.
-For each pair of related entities, extract:
-- source_entity: name of the source entity
-- target_entity: name of the target entity
-- relationship_description: explanation of the relationship (e.g., "The pilot failed to monitor the altitude, leading to the crash")
-- relationship_strength: a numeric score (1-10) indicating the significance of this link in the accident chain.
- Format each relationship as ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
+2. Identify significant causal or structural relationships.
+- relationship_strength: 1-10 (10 being most critical).
+Format: ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
  
-3. Return output in English (or the language of the source text if preferred, but usually English for consistency in KG) as a single list. Use **##** as the list delimiter.
+3. Include meta-entities such as the authors or organizations responsible for the document if they are mentioned.
  
-4. When finished, output <|COMPLETE|>
+4. **All outputs (names, descriptions) MUST be in the same language as the source text (e.g., Chinese if the report is in Chinese).** Only use the English type labels for entity_type (e.g., person, organization). Use **##** as the list delimiter.
+ 
+5. When finished, output <|COMPLETE|>
  
 ######################
 -Examples-
 ######################
-Example 1:
+Example 1 (English):
 Entity_types: PERSON, EQUIPMENT, EVENT, VIOLATION
 Text:
-The captain of flight AA123 failed to cross-check the altimeter settings before descent. As a result, the aircraft descended below the minimum safe altitude and struck a ridge. The post-crash investigation revealed that the captain violated the company's landing checklist procedures.
+The captain of flight AA123 failed to cross-check the altimeter settings before descent. As a result, the aircraft descended below the minimum safe altitude and struck a ridge.
 ######################
 Output:
 ("entity"<|>CAPTAIN OF FLIGHT AA123<|>PERSON<|>The pilot in command who failed to verify flight instruments)
 ##
 ("entity"<|>ALTIMETER<|>EQUIPMENT<|>Flight instrument used to measure altitude)
 ##
-("entity"<|>ALTITUDE DEVIATION<|>EVENT<|>The aircraft flying below the prescribed safe level)
+("relationship"<|>CAPTAIN OF FLIGHT AA123<|>ALTIMETER<|>The captain failed to verify the altimeter settings<|>9)
+<|COMPLETE|>
+
+Example 2 (Chinese):
+Entity_types: PERSON, ORGANIZATION, PROCEDURE
+Text:
+甲方：李海。乙方：工程师韩振宇。编制单位：航空安全实验室。
+######################
+Output:
+("entity"<|>李海<|>person<|>甲方负责人)
 ##
-("entity"<|>STRUCK A RIDGE<|>EVENT<|>The final impact of the aircraft with terrain)
+("entity"<|>工程师韩振宇<|>person<|>乙方工程师)
 ##
-("entity"<|>CHECKLIST VIOLATION<|>VIOLATION<|>Non-compliance with the company's mandatory landing procedures)
+("entity"<|>航空安全实验室<|>organization<|>编制单位)
 ##
-("relationship"<|>CAPTAIN OF FLIGHT AA123<|>ALTITUDE DEVIATION<|>The captain's failure to check instruments led to the altitude deviation<|>9)
-##
-("relationship"<|>ALTITUDE DEVIATION<|>STRUCK A RIDGE<|>The uncontrolled descent resulted in the collision with the ridge<|>10)
-##
-("relationship"<|>CAPTAIN OF FLIGHT AA123<|>CHECKLIST VIOLATION<|>The captain failed to follow the required checklist<|>8)
+("relationship"<|>李海<|>航空安全实验室<|>属于该实验室或与其合作<|>5)
 <|COMPLETE|>
 
 ######################
