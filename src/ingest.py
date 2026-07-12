@@ -33,7 +33,7 @@ def main():
     if not os.path.exists(args.output):
         os.makedirs(args.output)
 
-    for filename in os.listdir(args.source):
+    for i, filename in enumerate(os.listdir(args.source)):
         file_path = os.path.join(args.source, filename)
         content = ""
         if filename.endswith(".pdf"):
@@ -49,7 +49,7 @@ def main():
         
         if content:
             cleaned_content = clean_text(content)
-            output_filename = os.path.splitext(filename)[0] + ".txt"
+            output_filename = f"report_{i}.txt"
             with open(os.path.join(args.output, output_filename), 'w', encoding='utf-8') as f:
                 f.write(cleaned_content)
             print(f"Saved to {args.output}/{output_filename}")
