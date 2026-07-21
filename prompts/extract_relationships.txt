@@ -1,0 +1,44 @@
+-Goal-
+Given an aviation accident report and a list of identified entities, extract significant causal or structural relationships between them. Use the "Human-Machine-Environment-Management" (人-机-环-管) framework.
+
+-Relationship Types-
+- leads to / causes (导致): One event or factor resulting in another.
+- limited by (受限于): An entity's performance or state is constrained by another factor.
+- violates (违反): A person or action not following a procedure or regulation.
+- not executed (未执行): A required procedure or action that was omitted.
+- belongs to (属于): An entity is part of an organization or category.
+- manages / authors (管理/编写): An organization or person responsible for a document or system.
+
+-Steps-
+1. Identify significant causal or structural relationships based on the provided text and entities.
+- relationship_strength: 1-10 (10 being most critical).
+Format: ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
+
+2. **All outputs (descriptions) MUST be in the source language.** Use **##** as the delimiter.
+
+3. When finished, output <|COMPLETE|>
+
+######################
+-Examples-
+######################
+Example (Chinese):
+Text: 事故报告：CA1234航班燃油耗尽事件...
+Entities: CA1234航班, 左翼燃油管路, 燃油泄漏, 张伟, 迫降
+######################
+Output:
+("relationship"<|>左翼燃油管路<|>燃油泄漏<|>管路破裂导致泄漏<|>9)
+##
+("relationship"<|>燃油泄漏<|>CA1234航班<|>泄漏发生在航班飞行途中<|>8)
+##
+("relationship"<|>张伟<|>CA1234航班<|>机长负责该航班<|>5)
+##
+("relationship"<|>燃油泄漏<|>迫降<|>燃油耗尽导致迫降<|>10)
+<|COMPLETE|>
+
+######################
+-Real Data-
+######################
+Text: {input_text}
+Entities: {entities}
+######################
+Output:

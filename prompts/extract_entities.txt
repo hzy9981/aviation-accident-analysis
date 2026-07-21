@@ -1,0 +1,50 @@
+-Goal-
+Given an aviation accident report, extract the most significant entities based on the "Human-Machine-Environment-Management" (人-机-环-管) framework. Focus on entities critical to understanding the accident.
+
+-Entity Types-
+- person (人): Pilots, crew members, air traffic controllers, maintenance personnel, engineers, etc.
+- equipment (机/设备): Aircraft, engines, avionics, software systems, tools, etc.
+- environment (环/环境): Weather conditions, airport conditions, terrain, etc.
+- organization (组织): Airlines, regulatory bodies, laboratories, companies, etc.
+- procedure (程序): SOPs, manuals, checklists, etc.
+- event (事件): Specific occurrences (e.g., engine flameout).
+- weather (天气): Specific meteorological factors.
+- violation (违规): Non-compliance with regulations, procedures, or requirements.
+
+-Steps-
+1. Identify **core** entities.
+- Strictly use the types: person, equipment, environment, organization, procedure, event, weather, violation.
+- entity_name: Use the EXACT name from the text. Capitalize English if needed.
+- entity_description: Extremely concise (MAX 30 chars).
+- **Negative Constraints (DO NOT EXTRACT):**
+    - Specific dates/times, contact info, boilerplate, or metadata.
+Format: ("entity"<|><entity_name><|><entity_type><|><entity_description>)
+
+2. **All outputs (names, descriptions) MUST be in the source language.** Use English type labels. Use **##** as the delimiter.
+
+3. When finished, output <|COMPLETE|>
+
+######################
+-Examples-
+######################
+Example (Chinese):
+Text: 事故报告：CA1234航班燃油耗尽事件。摘要：CA1234航班在飞行途中，由于左翼燃油管路发生未检测到的泄漏，导致燃油水平降至警戒线以下。机长张伟在下降阶段未能及时检查燃油表，导致飞机在进近过程中双发熄火。最终，飞机在距离跑道2公里处的开阔地带进行紧急迫降。
+######################
+Output:
+("entity"<|>CA1234航班<|>equipment<|>发生燃油泄漏的航班)
+##
+("entity"<|>左翼燃油管路<|>equipment<|>发生泄漏的部件)
+##
+("entity"<|>燃油泄漏<|>event<|>由于管路破裂导致的燃油流失)
+##
+("entity"<|>张伟<|>person<|>机长)
+##
+("entity"<|>迫降<|>event<|>紧急迫降事件)
+<|COMPLETE|>
+
+######################
+-Real Data-
+######################
+Text: {input_text}
+######################
+Output:
