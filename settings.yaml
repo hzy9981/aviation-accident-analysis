@@ -7,18 +7,19 @@
 completion_models:
   default_completion_model:
     model_provider: openai
-    api_base: http://localhost:6006/v1
-    model: mistral-nemo
+    api_base: http://127.0.0.1:6006/v1
+    model: mistral-nemo:latest
     auth_method: api_key
     api_key: ollama
+    parallelism: 2
     retry:
       type: exponential_backoff
 
 embedding_models:
   default_embedding_model:
     model_provider: openai
-    api_base: http://localhost:6006/v1
-    model: mxbai-embed-large
+    api_base: http://127.0.0.1:6006/v1
+    model: mxbai-embed-large:latest
     auth_method: api_key
     api_key: ollama
     retry:

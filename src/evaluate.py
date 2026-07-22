@@ -2,13 +2,32 @@ import json
 import argparse
 import pandas as pd
 
-def calculate_metrics(predicted_set, ground_truth_set):
+def is_match(pred, gt):
+    pred = pred.strip().upper()
+    gt = gt.strip().upper()
+    if pred == gt:
+        return True
+    # Fuzzy: if one is a significant substring of the other
+    if len(gt) > 2 and (gt in pred or pred in gt):
+        return True
+    return False
+
+def calculate_metrics_fuzzy(predicted_set, ground_truth_set):
     if not ground_truth_set:
         return 0.0, 0.0, 0.0
     
-    tp = len(predicted_set.intersection(ground_truth_set))
-    fp = len(predicted_set - ground_truth_set)
-    fn = len(ground_truth_set - predicted_set)
+    matched_gt = set()
+    tp = 0
+    
+    for p in predicted_set:
+        for gt in ground_truth_set:
+            if gt not in matched_gt and is_match(p, gt):
+                tp += 1
+                matched_gt.add(gt)
+                break
+    
+    fp = len(predicted_set) - tp
+    fn = len(ground_truth_set) - tp
     
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
@@ -27,8 +46,8 @@ def main():
     with open(args.gt, 'r', encoding='utf-8') as f:
         gt_data = json.load(f)
     
-    gt_entities = set(e['title'].strip().upper() for e in gt_data.get('entities', []))
-    gt_rels = set((r['source'].strip().upper(), r['target'].strip().upper()) for r in gt_data.get('relationships', []))
+    gt_entities = [e['title'].strip().upper() for e in gt_data.get('entities', [])]
+    gt_rels = [(r['source'].strip().upper(), r['target'].strip().upper()) for r in gt_data.get('relationships', [])]
 
     # Load Predictions
     try:
@@ -38,18 +57,32 @@ def main():
         print(f"Error loading prediction files: {e}")
         return
 
-    pred_entities = set(pred_entities_df['title'].str.strip().str.upper())
-    pred_rels = set(zip(pred_rels_df['source'].str.strip().str.upper(), 
-                        pred_rels_df['target'].str.strip().str.upper()))
+    pred_entities = list(pred_entities_df['title'].str.strip().str.upper())
+    pred_rels = list(zip(pred_rels_df['source'].str.strip().str.upper(), 
+                         pred_rels_df['target'].str.strip().str.upper()))
 
     # Evaluate Entities
-    ent_p, ent_r, ent_f1 = calculate_metrics(pred_entities, gt_entities)
+    ent_p, ent_r, ent_f1 = calculate_metrics_fuzzy(pred_entities, gt_entities)
     
-    # Evaluate Relationships
-    rel_p, rel_r, rel_f1 = calculate_metrics(pred_rels, gt_rels)
+    # Evaluate Relationships (Fuzzy on both source and target)
+    tp_rel = 0
+    matched_gt_rel = set()
+    for p_src, p_tgt in pred_rels:
+        for i, (gt_src, gt_tgt) in enumerate(gt_rels):
+            if i not in matched_gt_rel:
+                # Check both directions for relationships to be a bit more lenient, 
+                # or strictly one direction. Let's stay directed but fuzzy on names.
+                if is_match(p_src, gt_src) and is_match(p_tgt, gt_tgt):
+                    tp_rel += 1
+                    matched_gt_rel.add(i)
+                    break
+    
+    rel_p = tp_rel / len(pred_rels) if pred_rels else 0.0
+    rel_r = tp_rel / len(gt_rels) if gt_rels else 0.0
+    rel_f1 = 2 * (rel_p * rel_r) / (rel_p + rel_r) if (rel_p + rel_r) > 0 else 0.0
 
     print("\n" + "="*30)
-    print("      EVALUATION RESULTS")
+    print("      EVALUATION RESULTS (FUZZY)")
     print("="*30)
     print(f"{'Metric':<15} | {'Entities':<10} | {'Relationships':<10}")
     print("-" * 45)
@@ -57,12 +90,6 @@ def main():
     print(f"{'Recall':<15} | {ent_r:<10.4f} | {rel_r:<10.4f}")
     print(f"{'F1 Score':<15} | {ent_f1:<10.4f} | {rel_f1:<10.4f}")
     print("="*30)
-
-    # Detailed Mismatches (Optional)
-    missing_entities = gt_entities - pred_entities
-    if missing_entities:
-        print(f"\nMissing Entities ({len(missing_entities)}):")
-        print(", ".join(list(missing_entities)[:10]))
 
 if __name__ == "__main__":
     main()

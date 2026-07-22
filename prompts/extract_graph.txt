@@ -1,75 +1,58 @@
 
 -Goal-
-Given an aviation accident report, project proposal, or evaluation plan, identify the most significant entities and causal/structural relationships. Use the "Human-Machine-Environment-Management" (人-机-环-管) framework. Focus on factors that are critical to understanding the document's main purpose or the accident's root causes.
+Given an aviation accident report, identify the **most significant** entities and causal/structural relationships. Use the "Human-Machine-Environment-Management" (人-机-环-管) framework.
 
 -Entity Types-
-- person (人): Pilots, crew members, air traffic controllers, maintenance personnel, engineers, authors, etc.
-- equipment (机/设备): Aircraft, engines, avionics, software systems, tools, etc.
-- environment (环/环境): Weather conditions, airport conditions, terrain, project constraints, etc.
-- organization (组织): Airlines, regulatory bodies, laboratories, companies, departments, etc.
-- procedure (程序): Standard Operating Procedures (SOPs), manuals, checklists, project plans, etc.
-- event (事件): Specific occurrences (e.g., engine flameout, project kickoff, system deployment).
-- weather (天气): Specific meteorological factors.
-- violation (违规): Non-compliance with regulations, procedures, or requirements.
+- person (人): Pilots, crew, controllers, maintenance, etc. (e.g., 张伟)
+- equipment (机/设备): Aircraft, engines, avionics, parts, etc. (e.g., 左翼燃油管路)
+- environment (环/环境): Weather, airport, terrain, etc. (e.g., 微下击暴流)
+- organization (组织): Airlines, regulatory bodies, etc. (e.g., 南方航空)
+- procedure (程序): SOPs, manuals, checklists, etc. (e.g., 大坡度复飞程序)
+- event (事件): Specific occurrences in the accident sequence. (e.g., 燃油泄漏, 机尾擦地, 发动机起火, 坠地, 迫降).
+- violation (违规): Non-compliance with rules.
 
 -Relationship Types-
-- leads to / causes (导致): One event or factor resulting in another.
-- limited by (受限于): An entity's performance or state is constrained by another factor.
-- violates (违反): A person or action not following a procedure or regulation.
-- not executed (未执行): A required procedure or action that was omitted.
-- belongs to (属于): An entity is part of an organization or category.
-- manages / authors (管理/编写): An organization or person responsible for a document or system.
+- leads to / causes (导致): **Direction: [Cause] -> [Effect]**.
+- limited by (受限于): Direction: [Entity] -> [Constraint].
+- violates (违反): Direction: [Person/Action] -> [Procedure].
+- belongs to (属于): Direction: [Member] -> [Organization].
 
 -Steps-
-1. Identify **core** entities. Only extract entities that directly play a causal or structural role in the accident.
-- Strictly use the types: person, equipment, environment, organization, procedure, event, weather, violation.
-- **Precision First:** Do not extract long descriptive phrases, procedural steps, or generic concepts as entities. If an entity name is longer than 5 words, it is likely too descriptive; simplify it to a noun phrase.
-- entity_name: **Normalize.** Use canonical names (e.g., "1号发动机" instead of "右侧发动机 （1号引擎）").
-- entity_description: **Concise (MAX 20 words).**
+1. Identify **core** entities.
+- **Normalization:** Use common noun phrases. **Exclude titles** (e.g., use "张伟", not "机长张伟").
 - **Strict Negative Constraints (DO NOT EXTRACT):**
-    - Descriptive clauses, full sentences, or abstract concepts.
-    - Entities that do not belong to the allowed types.
-    - Dates, times, boilerplate.
+    - Generic concepts: "事故", "原因", "结果", "日期", "地点", "报告", "情况".
+    - Meta-data: "2026年", "某机场", "摘要", "致因因素".
+    - Overly long phrases: "由于拉杆过猛导致接触跑道". (Split into entities and relationships).
 Format: ("entity"<|><entity_name><|><entity_type><|><entity_description>)
- 
-2. Identify significant causal or structural relationships.
-- **Evidence-Based:** Only extract a relationship if there is clear, explicit text in the source indicating a causal ("caused by", "led to") or structural ("is part of") link. If the relationship is implied, do not extract it.
-- relationship_strength: 1-10 (10 being most critical/explicit).
-Format: ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
- 
-3. **All outputs (names, descriptions) MUST be in the same language as the source text.** Only use the English type labels (person, organization, etc.). Use **##** as the list delimiter.
- 
-4. When finished, output <|COMPLETE|>
- 
-######################
--Examples-
-######################
-Example 1 (English):
-Entity_types: PERSON, EQUIPMENT, EVENT, VIOLATION
-Text:
-The captain of flight AA123 failed to cross-check the altimeter settings before descent. As a result, the aircraft descended below the minimum safe altitude and struck a ridge.
-######################
-Output:
-("entity"<|>CAPTAIN OF FLIGHT AA123<|>PERSON<|>The pilot in command who failed to verify flight instruments)
-##
-("entity"<|>ALTIMETER<|>EQUIPMENT<|>Flight instrument used to measure altitude)
-##
-("relationship"<|>CAPTAIN OF FLIGHT AA123<|>ALTIMETER<|>The captain failed to verify the altimeter settings<|>9)
-<|COMPLETE|>
 
-Example 2 (Chinese):
-Entity_types: PERSON, ORGANIZATION, PROCEDURE
-Text:
-甲方：李海。乙方：工程师韩振宇。编制单位：航空安全实验室。
+2. Identify causal relationships.
+- **Causal Chain:** Focus on the sequence: [Factor] -> [Event] -> [Outcome].
+- **Strength:** 1-10.
+Format: ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
+
+3. **All outputs MUST be in the source language.** Only use English type labels. Use **##** as delimiter.
+
+4. Output <|COMPLETE|>
+
 ######################
+-Example-
+######################
+Text: 燃油管路破裂导致燃油泄漏，机长张伟未能及时检查燃油表，导致飞机迫降。
 Output:
-("entity"<|>李海<|>person<|>甲方负责人)
+("entity"<|>左翼燃油管路<|>equipment<|>发生破裂的部件)
 ##
-("entity"<|>工程师韩振宇<|>person<|>乙方工程师)
+("entity"<|>燃油泄漏<|>event<|>燃油流失事件)
 ##
-("entity"<|>航空安全实验室<|>organization<|>编制单位)
+("entity"<|>张伟<|>person<|>机长)
 ##
-("relationship"<|>李海<|>航空安全实验室<|>属于该实验室或与其合作<|>5)
+("entity"<|>迫降<|>event<|>紧急迫降事件)
+##
+("relationship"<|>左翼燃油管路<|>燃油泄漏<|>管路破裂导致泄漏<|>9)
+##
+("relationship"<|>燃油泄漏<|>迫降<|>燃油耗尽导致迫降<|>10)
+##
+("relationship"<|>张伟<|>迫降<|>操作不当未及时检查<|>8)
 <|COMPLETE|>
 
 ######################
