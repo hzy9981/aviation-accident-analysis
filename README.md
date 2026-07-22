@@ -17,14 +17,9 @@
 - Python 3.10+
 - [uv](https://github.com/astral-sh/uv) (推荐)
 
-## 安装与配置
-1. 安装依赖：
-   ```bash
-   uv sync
-   ```
-2. 配置环境变量：
-   编辑 `.env` 文件，填入 `GRAPHRAG_API_KEY`。
-   如果使用 Ollama，请参考下文配置。
+## 环境配置注意事项
+- 若遇到 LLM 连接错误，请检查 `settings.yaml` 中的 `api_base` 是否配置正确。在某些 Docker 或受限环境中，建议将 `localhost` 修改为 `127.0.0.1`。
+- 本项目已对 `prompts/extract_graph.txt` 中的抽取示例进行了优化，通过引入复杂场景示例，提升了在航空事故报告中的实体抽取表现。
 
 ## 运行流程
 1. 将事故报告（PDF/DOCX/TXT）放入 `data/input_reports`。
