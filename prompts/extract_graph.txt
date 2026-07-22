@@ -21,27 +21,25 @@ Given an aviation accident report, project proposal, or evaluation plan, identif
 - manages / authors (管理/编写): An organization or person responsible for a document or system.
 
 -Steps-
-1. Identify **core** entities. Do not extract every minor detail; focus on what is central to the text.
+1. Identify **core** entities. Only extract entities that directly play a causal or structural role in the accident.
 - Strictly use the types: person, equipment, environment, organization, procedure, event, weather, violation.
-- entity_name: **Normalize entity names.** If multiple names refer to the same physical entity (e.g., "1号发动机" and "右侧发动机 （1号引擎）"), use a single, canonical name (e.g., "1号发动机"). Capitalize if the original is in English.
-- entity_description: **Extremely concise description (MAX 30 words/characters).**
-- **Negative Constraints (DO NOT EXTRACT):**
-    - Specific dates/times as entities (e.g., "2018年5月14日", "巡航阶段"). These should be part of descriptions or relationship attributes, not standalone entities.
-    - Contact information (emails, phone numbers, addresses).
-    - Generic locations unless they are the site of an accident (e.g., "区胜利镇云岭路 8 号").
-    - Document metadata or boilerplate (e.g., "联系机构", "目 录", "第 1.1 节").
-    - Highly specific part numbers or fastener types unless they are a root cause.
+- **Precision First:** Do not extract long descriptive phrases, procedural steps, or generic concepts as entities. If an entity name is longer than 5 words, it is likely too descriptive; simplify it to a noun phrase.
+- entity_name: **Normalize.** Use canonical names (e.g., "1号发动机" instead of "右侧发动机 （1号引擎）").
+- entity_description: **Concise (MAX 20 words).**
+- **Strict Negative Constraints (DO NOT EXTRACT):**
+    - Descriptive clauses, full sentences, or abstract concepts.
+    - Entities that do not belong to the allowed types.
+    - Dates, times, boilerplate.
 Format: ("entity"<|><entity_name><|><entity_type><|><entity_description>)
  
 2. Identify significant causal or structural relationships.
-- relationship_strength: 1-10 (10 being most critical).
+- **Evidence-Based:** Only extract a relationship if there is clear, explicit text in the source indicating a causal ("caused by", "led to") or structural ("is part of") link. If the relationship is implied, do not extract it.
+- relationship_strength: 1-10 (10 being most critical/explicit).
 Format: ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
  
-3. Include meta-entities such as the authors or organizations responsible for the document if they are mentioned.
+3. **All outputs (names, descriptions) MUST be in the same language as the source text.** Only use the English type labels (person, organization, etc.). Use **##** as the list delimiter.
  
-4. **All outputs (names, descriptions) MUST be in the same language as the source text (e.g., Chinese if the report is in Chinese).** Only use the English type labels for entity_type (e.g., person, organization). Use **##** as the list delimiter.
- 
-5. When finished, output <|COMPLETE|>
+4. When finished, output <|COMPLETE|>
  
 ######################
 -Examples-
