@@ -23,8 +23,14 @@ Given an aviation accident report, project proposal, or evaluation plan, identif
 -Steps-
 1. Identify **core** entities. Do not extract every minor detail; focus on what is central to the text.
 - Strictly use the types: person, equipment, environment, organization, procedure, event, weather, violation.
-- entity_name: **Use the EXACT name as it appears in the source text (do not translate, do not normalize).** Capitalize if the original is in English.
-- entity_description: Detailed description in the same language as the source text.
+- entity_name: **Normalize entity names.** If multiple names refer to the same physical entity (e.g., "1号发动机" and "右侧发动机 （1号引擎）"), use a single, canonical name (e.g., "1号发动机"). Capitalize if the original is in English.
+- entity_description: **Extremely concise description (MAX 30 words/characters).**
+- **Negative Constraints (DO NOT EXTRACT):**
+    - Specific dates/times as entities (e.g., "2018年5月14日", "巡航阶段"). These should be part of descriptions or relationship attributes, not standalone entities.
+    - Contact information (emails, phone numbers, addresses).
+    - Generic locations unless they are the site of an accident (e.g., "区胜利镇云岭路 8 号").
+    - Document metadata or boilerplate (e.g., "联系机构", "目 录", "第 1.1 节").
+    - Highly specific part numbers or fastener types unless they are a root cause.
 Format: ("entity"<|><entity_name><|><entity_type><|><entity_description>)
  
 2. Identify significant causal or structural relationships.
