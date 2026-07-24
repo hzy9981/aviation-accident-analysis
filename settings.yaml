@@ -7,10 +7,10 @@
 completion_models:
   default_completion_model:
     model_provider: openai
-    api_base: http://127.0.0.1:6006/v1
-    model: mistral-nemo:latest
+    api_base: https://generativelanguage.googleapis.com/v1beta/openai/
+    model: gemini-1.5-flash
     auth_method: api_key
-    api_key: ollama
+    api_key: ${GOOGLE_API_KEY}
     parallelism: 2
     retry:
       type: exponential_backoff
@@ -18,10 +18,10 @@ completion_models:
 embedding_models:
   default_embedding_model:
     model_provider: openai
-    api_base: http://127.0.0.1:6006/v1
-    model: mxbai-embed-large:latest
+    api_base: https://generativelanguage.googleapis.com/v1beta/openai/
+    model: text-embedding-004
     auth_method: api_key
-    api_key: ollama
+    api_key: ${GOOGLE_API_KEY}
     retry:
       type: exponential_backoff
 
