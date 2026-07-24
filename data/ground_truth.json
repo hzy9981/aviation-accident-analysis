@@ -1,23 +1,92 @@
 {
   "entities": [
-    {"title": "李海", "type": "PERSON"},
-    {"title": "工程师韩振宇", "type": "PERSON"},
-    {"title": "航空安全实验室", "type": "ORGANIZATION"},
-    {"title": "基于LLM与知识图谱的航空安全事故致因分析系统", "type": "ORGANIZATION"},
-    {"title": "飞机", "type": "EQUIPMENT"},
-    {"title": "燃油泄漏", "type": "EVENT"},
-    {"title": "迫降", "type": "EVENT"},
-    {"title": "雷雨", "type": "WEATHER"},
-    {"title": "飞行员", "type": "PERSON"},
-    {"title": "机尾擦地", "type": "EVENT"},
-    {"title": "违规起飞", "type": "VIOLATION"}
+    {
+      "title": "CA1234航班"
+    },
+    {
+      "title": "左翼燃油管路"
+    },
+    {
+      "title": "燃油泄漏"
+    },
+    {
+      "title": "张伟"
+    },
+    {
+      "title": "迫降"
+    },
+    {
+      "title": "MU5678"
+    },
+    {
+      "title": "微下击暴流"
+    },
+    {
+      "title": "王芳"
+    },
+    {
+      "title": "机尾擦地"
+    },
+    {
+      "title": "HU9101"
+    },
+    {
+      "title": "候鸟"
+    },
+    {
+      "title": "1号发动机"
+    },
+    {
+      "title": "发动机起火"
+    },
+    {
+      "title": "发动机火警处置程序"
+    }
   ],
   "relationships": [
-    {"source": "飞机", "target": "燃油泄漏"},
-    {"source": "燃油泄漏", "target": "迫降"},
-    {"source": "李海", "target": "基于LLM与知识图谱的航空安全事故致因分析系统"},
-    {"source": "工程师韩振宇", "target": "基于LLM与知识图谱的航空安全事故致因分析系统"},
-    {"source": "飞机", "target": "雷雨"},
-    {"source": "飞行员", "target": "违规起飞"}
+    {
+      "source": "左翼燃油管路",
+      "target": "燃油泄漏"
+    },
+    {
+      "source": "燃油泄漏",
+      "target": "CA1234航班"
+    },
+    {
+      "source": "张伟",
+      "target": "CA1234航班"
+    },
+    {
+      "source": "燃油泄漏",
+      "target": "迫降"
+    },
+    {
+      "source": "微下击暴流",
+      "target": "MU5678"
+    },
+    {
+      "source": "王芳",
+      "target": "机尾擦地"
+    },
+    {
+      "source": "MU5678",
+      "target": "机尾擦地"
+    },
+    {
+      "source": "候鸟",
+      "target": "HU9101"
+    },
+    {
+      "source": "候鸟",
+      "target": "1号发动机"
+    },
+    {
+      "source": "1号发动机",
+      "target": "发动机起火"
+    },
+    {
+      "source": "HU9101",
+      "target": "发动机火警处置程序"
+    }
   ]
 }
