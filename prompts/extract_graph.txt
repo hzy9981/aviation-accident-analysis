@@ -1,58 +1,64 @@
 
 -Goal-
-Given an aviation accident report, identify the **most significant** entities and causal/structural relationships. Use the "Human-Machine-Environment-Management" (人-机-环-管) framework.
+Given an aviation accident report, identify ONLY the **most critical** entities and causal relationships. Focus on the "Human-Machine-Environment-Management" (人-机-环-管) framework. Construct a clear causal chain [Factor] -> [Event] -> [Outcome].
 
 -Entity Types-
-- person (人): Pilots, crew, controllers, maintenance, etc. (e.g., 张伟)
-- equipment (机/设备): Aircraft, engines, avionics, parts, etc. (e.g., 左翼燃油管路)
-- environment (环/环境): Weather, airport, terrain, etc. (e.g., 微下击暴流)
-- organization (组织): Airlines, regulatory bodies, etc. (e.g., 南方航空)
-- procedure (程序): SOPs, manuals, checklists, etc. (e.g., 大坡度复飞程序)
-- event (事件): Specific occurrences in the accident sequence. (e.g., 燃油泄漏, 机尾擦地, 发动机起火, 坠地, 迫降).
-- violation (违规): Non-compliance with rules.
+- person (人): Specific named individuals only. (e.g., 张伟).
+- equipment (机/设备): Specific aircraft parts or systems. (e.g., 左翼燃油管路, 1号发动机).
+- environment (环/环境): Specific weather or physical conditions. (e.g., 微下击暴流, 候鸟).
+- organization (组织): Specific airlines or agencies. (e.g., 南方航空).
+- procedure (程序): Specific SOPs or manuals mentioned. (e.g., 燃油检查程序, 大坡度复飞程序).
+- event (事件): Major discrete occurrences. (e.g., 燃油泄漏, 机尾擦地, 发动机起火, 迫降).
+- violation (违规): Specific regulatory breaches.
 
 -Relationship Types-
-- leads to / causes (导致): **Direction: [Cause] -> [Effect]**.
-- limited by (受限于): Direction: [Entity] -> [Constraint].
-- violates (违反): Direction: [Person/Action] -> [Procedure].
-- belongs to (属于): Direction: [Member] -> [Organization].
+- leads to / causes (导致): [Cause] -> [Effect].
+- limited by (受限于): [Entity] -> [Constraint].
+- violates (违反): [Person/Action] -> [Procedure].
+- belongs to (属于): [Member] -> [Organization].
 
 -Steps-
 1. Identify **core** entities.
-- **Normalization:** Use common noun phrases. **Exclude titles** (e.g., use "张伟", not "机长张伟").
-- **Strict Negative Constraints (DO NOT EXTRACT):**
-    - Generic concepts: "事故", "原因", "结果", "日期", "地点", "报告", "情况".
-    - Meta-data: "2026年", "某机场", "摘要", "致因因素".
-    - Overly long phrases: "由于拉杆过猛导致接触跑道". (Split into entities and relationships).
+- **Atomic Entities:** Split long phrases. "左翼燃油管路破裂" should be Entity "左翼燃油管路" and Relationship "破裂导致".
+- **Strict Naming:** Use specific names. **ABSOLUTELY NO GENERIC TITLES** (e.g., use "张伟", NOT "机长"; use "王芳", NOT "副驾驶").
+- **No Demonstratives:** Never use "该...", "此...", "本...", "这个...".
 Format: ("entity"<|><entity_name><|><entity_type><|><entity_description>)
 
 2. Identify causal relationships.
-- **Causal Chain:** Focus on the sequence: [Factor] -> [Event] -> [Outcome].
-- **Strength:** 1-10.
+- **Chain of Causality:** Don't skip steps. If A causes B and B causes C, extract A->B and B->C.
 Format: ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
 
-3. **All outputs MUST be in the source language.** Only use English type labels. Use **##** as delimiter.
+3. **LANGUAGE & FORMAT:** 
+- **Language:** All names and descriptions MUST be in Chinese (source language).
+- **Types:** Type labels MUST be in English lowercase (e.g., person, event).
+- **Delimiter:** Use **##** between entries.
 
 4. Output <|COMPLETE|>
 
 ######################
 -Example-
 ######################
-Text: 燃油管路破裂导致燃油泄漏，机长张伟未能及时检查燃油表，导致飞机迫降。
+Text: CA1234航班因左翼燃油管路破裂导致燃油泄漏，进而燃油耗尽。机长张伟未按SOP检查，最终飞机迫降。
 Output:
+("entity"<|>CA1234航班<|>equipment<|>发生事故的航班)
+##
 ("entity"<|>左翼燃油管路<|>equipment<|>发生破裂的部件)
 ##
-("entity"<|>燃油泄漏<|>event<|>燃油流失事件)
+("entity"<|>燃油泄漏<|>event<|>由于管路破裂导致的燃油流失)
 ##
-("entity"<|>张伟<|>person<|>机长)
+("entity"<|>张伟<|>person<|>负责操纵的飞行员)
+##
+("entity"<|>SOP<|>procedure<|>标准作业程序)
 ##
 ("entity"<|>迫降<|>event<|>紧急迫降事件)
 ##
 ("relationship"<|>左翼燃油管路<|>燃油泄漏<|>管路破裂导致泄漏<|>9)
 ##
-("relationship"<|>燃油泄漏<|>迫降<|>燃油耗尽导致迫降<|>10)
+("relationship"<|>燃油泄漏<|>迫降<|>燃油耗尽导致双发熄火迫降<|>10)
 ##
-("relationship"<|>张伟<|>迫降<|>操作不当未及时检查<|>8)
+("relationship"<|>张伟<|>SOP<|>未按程序执行检查<|>8)
+##
+("relationship"<|>张伟<|>迫降<|>操作失误间接导致迫降<|>7)
 <|COMPLETE|>
 
 ######################
