@@ -63,6 +63,18 @@ uv run mcp_server.py
    - 参数 `template_name`: `prompts/` 目录下的模板名（默认 `extract_entities`）。
 2. `list_available_templates`: 列出所有可用的提示词模板。
 
+### 🐳 一键启动 (Docker)
+
+如果你想快速启动整个分析环境（包含 Neo4j 数据库和 MCP 服务），可以使用 Docker Compose：
+
+```bash
+docker-compose up -d
+```
+
+启动后：
+- **Neo4j 控制台**: [http://localhost:7474](http://localhost:7474) (默认账号: `neo4j`, 密码: `password`)
+- **MCP 服务**: 已在容器内运行，并自动连接到容器内的 Neo4j。
+
 ## 运行流程
 1. 将事故报告（PDF/DOCX/TXT）放入 `data/input_reports`。
 2. 运行流水线：

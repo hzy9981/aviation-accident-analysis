@@ -1,0 +1,70 @@
+
+-Goal-
+Given an aviation accident report, identify ONLY the **most critical** entities and causal relationships. Focus on the "Human-Machine-Environment-Management" (H-M-E-M) framework. Construct a clear causal chain [Factor] -> [Event] -> [Outcome].
+
+-Entity Types-
+- person: Specific named individuals only. (e.g., Zhang Wei).
+- equipment: Specific aircraft parts or systems. (e.g., Left wing fuel line, No.1 Engine).
+- environment: Specific weather or physical conditions. (e.g., Microburst, Migratory birds).
+- organization: Specific airlines or agencies. (e.g., Southern Airlines).
+- procedure: Specific SOPs or manuals mentioned. (e.g., Fuel check procedure, Steep turn go-around procedure).
+- event: Major discrete occurrences. (e.g., Fuel leak, Tail strike, Engine fire, Forced landing).
+- violation: Specific regulatory breaches.
+
+-Relationship Types-
+- leads to / causes: [Cause] -> [Effect].
+- limited by: [Entity] -> [Constraint].
+- violates: [Person/Action] -> [Procedure].
+- belongs to: [Member] -> [Organization].
+
+-Steps-
+1. Identify **core** entities.
+- **Atomic Entities:** Split long phrases. "Left wing fuel line rupture" should be Entity "Left wing fuel line" and Relationship "leads to rupture".
+- **Strict Naming:** Use specific names. **ABSOLUTELY NO GENERIC TITLES** (e.g., use "Zhang Wei", NOT "Captain"; use "Wang Fang", NOT "First Officer").
+- **No Demonstratives:** Never use "The component", "This system", etc.
+Format: ("entity"<|><entity_name><|><entity_type><|><entity_description>)
+
+2. Identify causal relationships.
+- **Chain of Causality:** Don't skip steps. If A causes B and B causes C, extract A->B and B->C.
+Format: ("relationship"<|><source_entity><|><target_entity><|><relationship_description><|><relationship_strength>)
+
+3. **LANGUAGE & FORMAT:** 
+- **Language:** All names and descriptions MUST be in English (source language).
+- **Types:** Type labels MUST be in English lowercase (e.g., person, event).
+- **Delimiter:** Use **##** between entries.
+
+4. Output <|COMPLETE|>
+
+######################
+-Example-
+######################
+Text: Flight CA1234 experienced fuel exhaustion due to a rupture in the left wing fuel line causing a leak. Captain Zhang Wei failed to check according to SOP, and ultimately the aircraft performed a forced landing.
+Output:
+("entity"<|>Flight CA1234<|>equipment<|>The accident aircraft)
+##
+("entity"<|>Left wing fuel line<|>equipment<|>The ruptured component)
+##
+("entity"<|>Fuel leak<|>event<|>Fuel loss caused by line rupture)
+##
+("entity"<|>Zhang Wei<|>person<|>Pilot in command)
+##
+("entity"<|>SOP<|>procedure<|>Standard Operating Procedure)
+##
+("entity"<|>Forced landing<|>event<|>Emergency forced landing event)
+##
+("relationship"<|>Left wing fuel line<|>Fuel leak<|>Line rupture leading to leak<|>9)
+##
+("relationship"<|>Fuel leak<|>Forced landing<|>Fuel exhaustion leading to dual engine flameout and landing<|>10)
+##
+("relationship"<|>Zhang Wei<|>SOP<|>Failed to follow check procedure<|>8)
+##
+("relationship"<|>Zhang Wei<|>Forced landing<|>Operational error indirectly leading to forced landing<|>7)
+<|COMPLETE|>
+
+######################
+-Real Data-
+######################
+Entity_types: {entity_types}
+Text: {input_text}
+######################
+Output:

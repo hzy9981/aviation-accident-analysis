@@ -1,0 +1,34 @@
+services:
+  neo4j:
+    image: neo4j:5.12
+    container_name: aviation-neo4j
+    ports:
+      - "7474:7474" # HTTP
+      - "7687:7687" # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/password
+      - NEO4J_PLUGINS=["apoc"]
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+
+  mcp-server:
+    build: .
+    container_name: aviation-mcp
+    depends_on:
+      - neo4j
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=password
+    volumes:
+      - ./input:/app/input
+      - ./prompts:/app/prompts
+    # Optional: if you want to use SSE transport for a persistent web-based MCP
+    # command: ["uv", "run", "python", "mcp_server.py", "--transport", "sse", "--port", "8000"]
+    # ports:
+    #   - "8000:8000"
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
