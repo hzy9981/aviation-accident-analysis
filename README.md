@@ -1,6 +1,9 @@
 # 航空事故致因抽取与知识图谱项目 (Aviation Accident Analysis)
 
-本项目基于 Microsoft GraphRAG 框架，旨在自动从航空事故报告中抽取实体与因果关系，并构建符合“人-机-环-管”框架的知识图谱。
+<!-- mcp-name: io.github.hzy9981/aviation-accident-analysis -->
+
+本项目基于 Microsoft GraphRAG 框架
+，旨在自动从航空事故报告中抽取实体与因果关系，并构建符合“人-机-环-管”框架的知识图谱。
 
 ## 项目结构
 - `data/`: 原始数据与地标数据。
@@ -40,6 +43,25 @@
 | **F1 分数 (F1 Score)** | **0.5405** | 0.0690 |
 
 **结论**：实体抽取的精确率和 F1 分数相比基准版本有显著提升。关系抽取受限于本地模型的指令遵循能力，仍有优化空间。
+
+## MCP 服务 (Model Context Protocol)
+
+本项目提供了一个 MCP 服务，方便通过 MCP 客户端（如 Claude Desktop）直接调用文档解析与提示词生成功能。
+
+### 核心功能
+- **文档解析**：支持 PDF、DOCX、TXT 格式的自动解析与清洗。
+- **提示词注入**：将解析出的文档内容自动注入到指定的提示词模板中。
+
+### 启动方式
+```bash
+uv run mcp_server.py
+```
+
+### 可用工具
+1. `upload_and_generate_prompt`:
+   - 参数 `file_path`: 文档路径。
+   - 参数 `template_name`: `prompts/` 目录下的模板名（默认 `extract_entities`）。
+2. `list_available_templates`: 列出所有可用的提示词模板。
 
 ## 运行流程
 1. 将事故报告（PDF/DOCX/TXT）放入 `data/input_reports`。

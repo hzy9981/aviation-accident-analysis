@@ -5,23 +5,7 @@ from pypdf import PdfReader
 import docx
 import shutil
 
-def parse_pdf(file_path):
-    reader = PdfReader(file_path)
-    text = ""
-    for page in reader.pages:
-        page_text = page.extract_text()
-        if page_text:
-            text += page_text + "\n"
-    return text
-
-def parse_docx(file_path):
-    doc = docx.Document(file_path)
-    return "\n".join([para.text for para in doc.paragraphs])
-
-def clean_text(text):
-    lines = text.split('\n')
-    cleaned_lines = [line.strip() for line in lines if line.strip()]
-    return "\n".join(cleaned_lines)
+from src.parser import parse_file
 
 def main():
     parser = argparse.ArgumentParser(description="Ingest aviation accident reports into GraphRAG input directory.")
@@ -44,26 +28,16 @@ def main():
             continue
             
         filename = file_path.name
-        content = ""
-        
-        if file_path.suffix.lower() == ".pdf":
-            print(f"Parsing PDF: {filename}")
-            content = parse_pdf(file_path)
-        elif file_path.suffix.lower() == ".docx":
-            print(f"Parsing DOCX: {filename}")
-            content = parse_docx(file_path)
-        elif file_path.suffix.lower() == ".txt":
-            print(f"Reading TXT: {filename}")
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-        
-        if content:
-            cleaned_content = clean_text(content)
+        try:
+            print(f"Processing: {filename}")
+            cleaned_content = parse_file(file_path)
             # Use original stem and append .txt
             output_filename = file_path.stem + ".txt"
             with open(output_dir / output_filename, 'w', encoding='utf-8') as f:
                 f.write(cleaned_content)
             print(f"Saved to {output_dir}/{output_filename}")
+        except Exception as e:
+            print(f"Error processing {filename}: {e}")
 
 if __name__ == "__main__":
     main()

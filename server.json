@@ -1,0 +1,33 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.hzy9981/aviation-accident-analysis",
+  "version": "0.1.0",
+  "title": "Aviation Accident Analysis MCP",
+  "description": "Aviation accident report parsing (PDF, DOCX, TXT) and prompt generation service for Human-Machine-Environment-Management analysis.",
+  "websiteUrl": "https://github.com/hzy9981/aviation-accident-analysis",
+  "repository": {
+    "url": "https://github.com/hzy9981/aviation-accident-analysis",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org/simple",
+      "identifier": "aviation-accident-analysis",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtime": "python",
+      "environmentVariables": []
+    }
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "tool": "mcp-publisher",
+      "build_info": {
+        "timestamp": "2026-07-27T00:05:00Z"
+      }
+    }
+  }
+}
