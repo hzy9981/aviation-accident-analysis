@@ -3,7 +3,7 @@
   "name": "io.github.hzy9981/aviation-accident-analysis",
   "version": "0.1.0",
   "title": "Aviation Accident Analysis MCP",
-  "description": "Aviation accident report parsing (PDF, DOCX, TXT) and prompt generation service for Human-Machine-Environment-Management analysis.",
+  "description": "Aviation accident report parsing and prompt generation service for accident analysis.",
   "websiteUrl": "https://github.com/hzy9981/aviation-accident-analysis",
   "repository": {
     "url": "https://github.com/hzy9981/aviation-accident-analysis",
@@ -12,7 +12,7 @@
   "packages": [
     {
       "registryType": "pypi",
-      "registryBaseUrl": "https://pypi.org/simple",
+      "registryBaseUrl": "https://pypi.org",
       "identifier": "aviation-accident-analysis",
       "version": "0.1.0",
       "transport": {
